@@ -2,12 +2,27 @@
 
 --changeset bovsunovsky:create-tables
 
+CREATE TYPE user_role AS ENUM ('User', 'Admin');
+
+CREATE TYPE book_genre AS ENUM (
+    'Fantasy',
+    'Science',
+    'History',
+    'Programming',
+    'Other'
+);
+
+CREATE TYPE book_status AS ENUM (
+    'Available',
+    'Borrowed'
+);
+
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     fullname VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL,
+    role user_role NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
     );
 
@@ -16,8 +31,8 @@ CREATE TABLE IF NOT EXISTS books (
     title VARCHAR(255) NOT NULL,
     author VARCHAR(255) NOT NULL,
     publish_year INTEGER,
-    genre VARCHAR(50),
-    status VARCHAR(20),
+    genre book_genre,
+    status book_status,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
     );
 
