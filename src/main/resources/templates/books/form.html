@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(${book.id == null ? 'Нова книга' : 'Редагування'}, ~{::section})}">
+<body>
+<section>
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0 text-center">
+                    <div class="mb-3">
+                        <i class="bi bi-journal-plus text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h3 class="fw-bold" th:text="${book.id == null} ? 'Додати нову книгу' : 'Редагувати книгу'">Форма</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form th:action="${book.id == null} ? @{/books} : @{/books/{id}/edit(id=${book.id})}" th:object="${book}" method="post">
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="titleInput" th:field="*{title}"
+                                   placeholder="Назва" required
+                                   pattern=".*\S.*"
+                                   title="Назва книги не може бути порожньою або складатися лише з пробілів"/>
+                            <label for="titleInput">Назва книги *</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="authorInput" th:field="*{author}"
+                                   placeholder="Автор" required
+                                   pattern=".*\S.*"
+                                   title="Ім'я автора не може бути порожнім або складатися лише з пробілів"/>
+                            <label for="authorInput">Автор *</label>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="yearInput" th:field="*{publishYear}" min="1000" max="2026" placeholder="Рік"/>
+                                    <label for="yearInput">Рік видання</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="genreSelect" th:field="*{genre}">
+                                        <option value="">-- Оберіть жанр --</option>
+                                        <option th:each="g : ${genres}" th:value="${g}" th:text="${g}"></option>
+                                    </select>
+                                    <label for="genreSelect">Жанр</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a th:href="@{/books}" class="btn btn-light px-4">Скасувати</a>
+                            <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save"></i> Зберегти</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

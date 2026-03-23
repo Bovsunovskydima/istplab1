@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout(${book.title}, ~{::section})}">
+<body>
+<section>
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/books}" class="text-decoration-none">Каталог</a></li>
+            <li class="breadcrumb-item active" aria-current="page" th:text="${book.title}">Книга</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4 d-flex gap-4 flex-column flex-md-row">
+                    <div class="rounded bg-light d-flex align-items-center justify-content-center flex-shrink-0" style="width: 150px; height: 200px;">
+                        <i class="bi bi-book text-secondary" style="font-size: 4rem;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h2 class="fw-bold mb-1" th:text="${book.title}">Назва книги</h2>
+
+                            <div class="text-end">
+                                <span th:class="${book.status.name() == 'Available'} ? 'badge bg-success fs-6' : 'badge bg-warning text-dark fs-6'"
+                                      th:text="${book.status.name() == 'Available' ? 'Доступно' : 'Взято'}">Статус</span>
+
+                                <div sec:authorize="hasAuthority('Admin')" th:if="${currentBorrower != null}" class="mt-2 small">
+                                    <span class="text-muted">Читає:</span>
+                                    <a th:href="@{/users/{id}(id=${currentBorrower.id})}" class="fw-bold text-decoration-none text-primary" th:text="${currentBorrower.fullName}">Ім'я</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="text-muted mb-3" th:text="${book.author}">Автор</h5>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-4">
+                                <div class="text-muted small">Жанр</div>
+                                <div class="fw-semibold" th:text="${book.genre}">Жанр</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="text-muted small">Рік видання</div>
+                                <div class="fw-semibold" th:text="${book.publishYear}">Рік</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="text-muted small">Рейтинг</div>
+                                <div class="fw-semibold text-warning">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span th:text="${avgRating != null ? #numbers.formatDecimal(avgRating, 1, 1) : 'Немає оцінок'}">Оцінка</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3">
+                            <form sec:authorize="isAuthenticated()" th:if="${book.status.name() == 'Available'}" th:action="@{/borrow/take/{id}(id=${book.id})}" method="post">
+                                <button class="btn btn-primary shadow-sm"><i class="bi bi-bookmark-plus"></i> Взяти книгу</button>
+                            </form>
+
+                            <form th:if="${activeRecordId != null}" th:action="@{/borrow/return/{id}(id=${activeRecordId})}" method="post">
+                                <button class="btn btn-success shadow-sm"><i class="bi bi-arrow-return-left"></i> Повернути книгу</button>
+                            </form>
+
+                            <div sec:authorize="hasAuthority('Admin')" class="d-flex gap-2">
+                                <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-outline-secondary"><i class="bi bi-pencil"></i> Редагувати</a>
+                                <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post" onsubmit="return confirm('Ви впевнені, що хочете видалити цю книгу?');">
+                                    <button class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div sec:authorize="isAnonymous()" th:if="${book.status.name() == 'Available'}" class="mt-3">
+                            <a th:href="@{/login}" class="btn btn-outline-primary btn-sm">Увійдіть, щоб взяти книгу</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                    <h4 class="fw-bold mb-0">Відгуки (<span th:text="${#lists.size(reviews)}">0</span>)</h4>
+                </div>
+                <div class="card-body">
+
+                    <form sec:authorize="isAuthenticated()" th:action="@{/reviews}" method="post" class="mb-4 bg-light p-3 rounded">
+                        <input type="hidden" name="bookId" th:value="${book.id}"/>
+                        <div class="row g-2 align-items-start">
+                            <div class="col-auto">
+                                <select name="rating" class="form-select border-warning text-warning fw-bold">
+                                    <option th:each="i : ${#numbers.sequence(5,1,-1)}" th:value="${i}" th:text="${i} + ' ★'"></option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <input type="text" name="comment" class="form-control" placeholder="Напишіть ваші враження..." required/>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-success"><i class="bi bi-send"></i> Надіслати</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div sec:authorize="isAnonymous()" class="alert alert-secondary mb-4 small py-2">
+                        Щоб залишити відгук, будь ласка, <a th:href="@{/login}" class="alert-link">увійдіть в систему</a>.
+                    </div>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div th:each="review : ${reviews}" class="p-3 border rounded bg-white">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-secondary text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 32px; height: 32px;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <strong th:text="${review.user.fullName}">Ім'я</strong>
+                                </div>
+                                <div class="text-warning small">
+                                    <i th:each="i : ${#numbers.sequence(1, review.rating)}" class="bi bi-star-fill"></i><i th:each="i : ${#numbers.sequence(review.rating + 1, 5, 1)}" th:if="${review.rating < 5}" class="bi bi-star text-muted"></i>
+                                </div>
+                            </div>
+                            <p class="mb-2 text-dark" th:text="${review.comment}">Коментар</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted" th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy HH:mm')}">Дата</small>
+
+                                <div th:if="${#authorization.expression('hasAuthority(''Admin'')') or (#authentication.name != 'anonymousUser' and #authentication.name == review.user.email)}">
+                                    <form th:action="@{/reviews/{id}/delete(id=${review.id})}" method="post" onsubmit="return confirm('Точно видалити відгук?');">
+                                        <input type="hidden" name="bookId" th:value="${book.id}"/>
+                                        <button class="btn btn-link text-danger p-0 text-decoration-none small">Видалити</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${#lists.isEmpty(reviews)}" class="text-muted text-center py-3">
+                            Ще немає відгуків. Будьте першим!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

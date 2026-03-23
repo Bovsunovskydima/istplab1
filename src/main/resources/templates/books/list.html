@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml"
+      th:replace="~{layout :: layout('Каталог книг', ~{::section})}">
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="bi bi-journal-text"></i> Каталог книг</h2>
+        <a sec:authorize="hasAuthority('Admin')" th:href="@{/books/new}" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-lg"></i> Додати книгу
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <form th:action="@{/books}" method="get" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0 ps-0"
+                               placeholder="Пошук за назвою або автором..." th:value="${search}"/>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select name="genre" class="form-select">
+                        <option value="">Всі жанри</option>
+                        <option th:each="g : ${genres}" th:value="${g}" th:text="${g}" th:selected="${g == selectedGenre}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-dark w-100">Шукати</button>
+                </div>
+                <div class="col-md-1">
+                    <a th:href="@{/books}" class="btn btn-outline-secondary w-100" title="Скинути фільтри"><i class="bi bi-x-lg"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="col" th:each="book : ${books}">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="book-cover-placeholder">
+                    <i class="bi bi-book display-1 opacity-50"></i>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-light text-dark border" th:text="${book.genre}">Жанр</span>
+                        <span th:class="${book.status.name() == 'Available'} ? 'badge bg-success' : 'badge bg-warning text-dark'"
+                              th:text="${book.status.name() == 'Available' ? 'Доступно' : 'В оренді'}">Статус</span>
+                    </div>
+                    <h5 class="card-title fw-bold text-truncate" th:text="${book.title}">Назва книги</h5>
+                    <p class="card-text text-muted mb-1"><i class="bi bi-person"></i> <span th:text="${book.author}">Автор</span></p>
+                    <p class="card-text text-muted small"><i class="bi bi-calendar"></i> <span th:text="${book.publishYear}">Рік</span></p>
+
+                    <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                        <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-sm btn-outline-primary w-100">Детальніше</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(books)}" class="text-center py-5 text-muted">
+        <i class="bi bi-inbox display-1"></i>
+        <h4 class="mt-3">Книг не знайдено</h4>
+        <p>Спробуйте змінити критерії пошуку.</p>
+    </div>
+</section>
+</body>
+</html>

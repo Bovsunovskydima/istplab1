@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout :: layout('Користувачі', ~{::section})}">
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="bi bi-people"></i> Користувачі</h2>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">#</th>
+                        <th>Ім'я</th>
+                        <th>Email</th>
+                        <th>Роль</th>
+                        <th>Дата реєстрації</th>
+                        <th class="text-end pe-4">Дії</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user : ${users}">
+                        <td class="ps-4 text-muted" th:text="${user.id}"></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center" style="width: 35px; height: 35px;">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <span class="fw-semibold" th:text="${user.fullName}"></span>
+                            </div>
+                        </td>
+                        <td class="text-muted" th:text="${user.email}"></td>
+                        <td>
+                                <span th:class="${user.role.name() == 'Admin'} ? 'badge bg-danger' : 'badge bg-secondary'"
+                                      th:text="${user.role}"></span>
+                        </td>
+                        <td th:text="${#temporals.format(user.createdAt, 'dd.MM.yyyy')}"></td>
+                        <td class="text-end pe-4">
+                            <a th:href="@{/users/{id}(id=${user.id})}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-person-lines-fill"></i> Профіль
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(users)}">
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                            Список користувачів порожній
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

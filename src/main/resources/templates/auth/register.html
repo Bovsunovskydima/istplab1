@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Реєстрація', ~{::section})}">
+<body>
+<section>
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus text-success" style="font-size: 3rem;"></i>
+                        <h3 class="fw-bold mt-2">Створити акаунт</h3>
+                    </div>
+
+                    <form th:action="@{/register}" method="post" th:object="${user}">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="nameInput" th:field="*{fullName}"
+                                   placeholder="Іван Іванов" required
+                                   pattern=".*\S.*"
+                                   title="Ім'я не може бути порожнім або складатися лише з пробілів">
+                            <label for="nameInput">ПІБ (Повне ім'я)</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="emailInput" th:field="*{email}" placeholder="name@example.com" required>
+                            <label for="emailInput">Email адреса</label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control" id="passwordInput" name="rawPassword" placeholder="Password" required minlength="6">
+                            <label for="passwordInput">Пароль (мінімум 6 символів)</label>
+                        </div>
+                        <button class="btn btn-success w-100 py-2 mb-3 shadow-sm" type="submit">Зареєструватися</button>
+                    </form>
+
+                    <div class="text-center small">
+                        Вже маєте акаунт? <a th:href="@{/login}" class="text-decoration-none">Увійти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

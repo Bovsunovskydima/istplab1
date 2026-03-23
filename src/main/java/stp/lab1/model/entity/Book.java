@@ -2,6 +2,8 @@ package stp.lab1.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import stp.lab1.model.enums.BookGenre;
 import stp.lab1.model.enums.BookStatus;
 
@@ -29,11 +31,11 @@ public class Book {
     @Column(name = "publish_year")
     private Integer publishYear;
 
-    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "genre")
     private BookGenre genre;
 
-    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status")
     private BookStatus status = BookStatus.Available;
 
