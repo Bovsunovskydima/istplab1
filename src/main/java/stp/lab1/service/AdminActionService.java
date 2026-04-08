@@ -20,7 +20,6 @@ public class AdminActionService {
         AdminAction action = AdminAction.builder()
                 .admin(admin)
                 .actionDescription(description)
-                // actionDate проставиться автоматично завдяки твоєму @PrePersist
                 .build();
         adminActionRepository.save(action);
     }

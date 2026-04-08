@@ -1,18 +1,21 @@
 package stp.lab1.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import stp.lab1.model.entity.Book;
 import stp.lab1.model.entity.BorrowRecord;
 import stp.lab1.model.entity.User;
 import stp.lab1.model.enums.BookGenre;
 import stp.lab1.model.enums.BookStatus;
-import stp.lab1.service.BookService;
-import stp.lab1.service.BorrowService;
-import stp.lab1.service.ReviewService;
-import stp.lab1.service.UserService;
+import stp.lab1.service.*;
 
 import java.security.Principal;
 
@@ -24,6 +27,7 @@ public class BookController {
     private final ReviewService reviewService;
     private final UserService userService;
     private final BorrowService borrowService;
+    private final ExcelDataPortService excelDataPortService;
 
     @GetMapping
     public String list(@RequestParam(required = false) String search,
@@ -92,6 +96,27 @@ public class BookController {
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id) {
         bookService.delete(id);
+        return "redirect:/books";
+    }
+
+    @GetMapping("/export")
+    @PreAuthorize("hasAuthority('Admin')")
+    public ResponseEntity<InputStreamResource> exportExcel() {
+        String filename = "library_books_" + java.time.LocalDate.now() + ".xlsx";
+        InputStreamResource file = new InputStreamResource(excelDataPortService.exportBooksToExcel());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(file);
+    }
+
+    @PostMapping("/import")
+    @PreAuthorize("hasAuthority('Admin')")
+    public String importExcel(@RequestParam("file") MultipartFile file) {
+        if (!file.isEmpty()) {
+            excelDataPortService.importBooksFromExcel(file);
+        }
         return "redirect:/books";
     }
 }

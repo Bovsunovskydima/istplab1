@@ -1,6 +1,6 @@
 package stp.lab1.model.enums;
 
-public enum BookGenre { // These are preliminary values, I will change them later.
+public enum BookGenre {
     Fantasy,
     Science,
     History,

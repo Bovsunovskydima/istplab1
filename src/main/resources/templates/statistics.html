@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout('Статистика', ~{::section})}">
+<body>
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark"><i class="bi bi-bar-chart-fill text-primary"></i> Аналітика бібліотеки</h2>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-center text-muted mb-3">Кількість книг за роками видання</h5>
+                    <div id="booksByYearChart" style="width: 100%; height: 400px;">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <div class="spinner-border text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-center text-muted mb-3">Розподіл книг за жанрами</h5>
+                    <div id="booksByGenreChart" style="width: 100%; height: 400px;">
+                        <div class="d-flex justify-content-center align-items-center h-100">
+                            <div class="spinner-border text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        // Завантажуємо пакети Google Charts
+        google.charts.load('current', {'packages':['corechart']});
+
+        // Встановлюємо callback, який викличеться після завантаження бібліотеки
+        google.charts.setOnLoadCallback(drawAllCharts);
+
+        function drawAllCharts() {
+            drawYearChart();
+            drawGenreChart();
+        }
+
+        function drawYearChart() {
+            fetch('/api/charts/booksByYear')
+                .then(response => response.json())
+                .then(data => {
+                    const dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Рік');
+                    dataTable.addColumn('number', 'Кількість книг');
+
+                    data.forEach(item => {
+                        dataTable.addRow([item.year, item.count]);
+                    });
+
+                    const options = {
+                        legend: { position: 'none' },
+                        colors: ['#4e73df'],
+                        animation: { startup: true, duration: 1000, easing: 'out' },
+                        vAxis: { minValue: 0, format: '0' }
+                    };
+
+                    const chart = new google.visualization.ColumnChart(document.getElementById('booksByYearChart'));
+                    chart.draw(dataTable, options);
+                });
+        }
+
+        function drawGenreChart() {
+            fetch('/api/charts/booksByGenre')
+                .then(response => response.json())
+                .then(data => {
+                    const dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Жанр');
+                    dataTable.addColumn('number', 'Кількість книг');
+
+                    data.forEach(item => {
+                        dataTable.addRow([item.genre, item.count]);
+                    });
+
+                    const options = {
+                        pieHole: 0.4, // робить графік у вигляді "бублика"
+                        animation: { startup: true, duration: 1000, easing: 'out' },
+                        chartArea: {width: '90%', height: '80%'}
+                    };
+
+                    const chart = new google.visualization.PieChart(document.getElementById('booksByGenreChart'));
+                    chart.draw(dataTable, options);
+                });
+        }
+    </script>
+</section>
+</body>
+</html>

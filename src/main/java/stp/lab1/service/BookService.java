@@ -3,6 +3,8 @@ package stp.lab1.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import stp.lab1.model.CountByGenreDTO;
+import stp.lab1.model.CountByYearDTO;
 import stp.lab1.model.entity.Book;
 import stp.lab1.model.enums.BookGenre;
 import stp.lab1.repository.BookRepository;
@@ -44,5 +46,17 @@ public class BookService {
 
     public void delete(Long id) {
         bookRepository.deleteById(id);
+    }
+
+    public List<CountByYearDTO> getBooksCountByYear() {
+        return bookRepository.countBooksByPublishYear().stream()
+                .map(row -> new CountByYearDTO(String.valueOf(row[0]), (Long) row[1]))
+                .toList();
+    }
+
+    public List<CountByGenreDTO> getBooksCountByGenre() {
+        return bookRepository.countBooksByGenre().stream()
+                .map(row -> new CountByGenreDTO(row[0].toString(), (Long) row[1]))
+                .toList();
     }
 }
