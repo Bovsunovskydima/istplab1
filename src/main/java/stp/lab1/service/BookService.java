@@ -18,10 +18,9 @@ public class BookService {
 
     @Transactional(readOnly = true)
     public List<Book> findAll(String search, BookGenre genre) {
-        if ((search == null || search.isBlank()) && genre == null)
-            return bookRepository.findAll();
-        return bookRepository.findBySearchAndGenre(
-            search == null || search.isBlank() ? null : search, genre);
+        String searchParam = (search == null || search.isBlank()) ? null : search;
+        String genreParam = (genre == null) ? null : genre.name();
+        return bookRepository.findBySearchAndGenre(searchParam, genreParam);
     }
 
     @Transactional(readOnly = true)

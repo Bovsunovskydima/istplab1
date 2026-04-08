@@ -23,7 +23,7 @@
                 <div class="col-md-4">
                     <select name="genre" class="form-select">
                         <option value="">Всі жанри</option>
-                        <option th:each="g : ${genres}" th:value="${g}" th:text="${g}" th:selected="${g == selectedGenre}"></option>
+                        <option th:each="g : ${genres}" th:value="${g.name()}" th:text="${g}" th:selected="${g == selectedGenre}"></option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -39,7 +39,7 @@
     <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
         <div class="col" th:each="book : ${books}">
             <div class="card h-100 border-0 shadow-sm hover-card">
-                <div class="book-cover-placeholder">
+                <div class="book-cover-placeholder text-center py-4 bg-light">
                     <i class="bi bi-book display-1 opacity-50"></i>
                 </div>
                 <div class="card-body d-flex flex-column">

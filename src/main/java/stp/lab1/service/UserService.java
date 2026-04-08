@@ -11,6 +11,7 @@ import stp.lab1.model.enums.UserRole;
 import stp.lab1.repository.BorrowRecordRepository;
 import stp.lab1.repository.UserRepository;
 
+import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -20,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BorrowRecordRepository borrowRecordRepository;
+    private final AdminActionService adminActionService;
 
     @Transactional(readOnly = true)
     public List<User> findAll() {
@@ -41,14 +43,19 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void changeRole(Long id, UserRole role) {
+    @Transactional
+    public void changeRole(Long id, UserRole role, Principal principal) {
         User targetUser = findById(id);
+        User currentAdmin = findByEmail(principal.getName());
 
         if (targetUser.getRole() == UserRole.Admin) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Зміна ролі адміністратора заборонена!");
         }
         targetUser.setRole(role);
         userRepository.save(targetUser);
+
+        adminActionService.logAction(currentAdmin,
+                "Змінено роль користувачу " + targetUser.getEmail() + " на " + role.name());
     }
 
     @Transactional(readOnly = true)

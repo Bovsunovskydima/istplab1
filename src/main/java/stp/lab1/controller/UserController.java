@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 import stp.lab1.model.enums.UserRole;
 import stp.lab1.service.UserService;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -28,8 +30,8 @@ public class UserController {
     }
 
     @PostMapping("/{id}/role")
-    public String changeRole(@PathVariable Long id, @RequestParam UserRole role) {
-        userService.changeRole(id, role);
+    public String changeRole(@PathVariable Long id, @RequestParam UserRole role,Principal principal) {
+        userService.changeRole(id, role, principal);
         return "redirect:/users/" + id;
     }
 }

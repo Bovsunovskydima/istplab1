@@ -35,6 +35,9 @@
                 <li class="nav-item" sec:authorize="hasAuthority('Admin')">
                     <a class="nav-link" th:href="@{/users}"><i class="bi bi-people"></i> Користувачі</a>
                 </li>
+                <li class="nav-item" sec:authorize="hasAuthority('Admin')">
+                    <a class="nav-link" th:href="@{/admin/actions}"><i class="bi bi-card-list"></i> Журнал дій</a>
+                </li>
             </ul>
 
             <ul class="navbar-nav ms-auto align-items-center">
