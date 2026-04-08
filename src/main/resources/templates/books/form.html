@@ -34,17 +34,17 @@
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <input type="number" class="form-control" id="yearInput" th:field="*{publishYear}" min="1000" max="2026" placeholder="Рік"/>
-                                    <label for="yearInput">Рік видання</label>
+                                    <input type="number" class="form-control" id="yearInput" th:field="*{publishYear}" min="1000" max="2026" placeholder="Рік" required />
+                                    <label for="yearInput">Рік видання *</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
-                                    <select class="form-select" id="genreSelect" th:field="*{genre}">
+                                    <select class="form-select" id="genreSelect" th:field="*{genre}" required>
                                         <option value="">-- Оберіть жанр --</option>
                                         <option th:each="g : ${genres}" th:value="${g}" th:text="${g}"></option>
                                     </select>
-                                    <label for="genreSelect">Жанр</label>
+                                    <label for="genreSelect">Жанр *</label>
                                 </div>
                             </div>
                         </div>

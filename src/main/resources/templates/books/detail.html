@@ -84,22 +84,33 @@
                 </div>
                 <div class="card-body">
 
-                    <form sec:authorize="isAuthenticated()" th:action="@{/reviews}" method="post" class="mb-4 bg-light p-3 rounded">
-                        <input type="hidden" name="bookId" th:value="${book.id}"/>
-                        <div class="row g-2 align-items-start">
-                            <div class="col-auto">
-                                <select name="rating" class="form-select border-warning text-warning fw-bold">
-                                    <option th:each="i : ${#numbers.sequence(5,1,-1)}" th:value="${i}" th:text="${i} + ' ★'"></option>
-                                </select>
+                    <th:block sec:authorize="isAuthenticated()"
+                              th:with="currentUserEmail=${#authentication.name},
+                                       hasReviewed=${#lists.size(reviews.?[user.email == #root.currentUserEmail]) > 0}">
+
+                        <form th:if="${!hasReviewed}" th:action="@{/reviews}" method="post" class="mb-4 bg-light p-3 rounded">
+                            <input type="hidden" name="bookId" th:value="${book.id}"/>
+                            <div class="row g-2 align-items-start">
+                                <div class="col-auto">
+                                    <select name="rating" class="form-select border-warning text-warning fw-bold">
+                                        <option th:each="i : ${#numbers.sequence(5,1,-1)}" th:value="${i}" th:text="${i} + ' ★'"></option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <input type="text" name="comment" class="form-control"
+                                           placeholder="Напишіть ваші враження..." required
+                                           pattern=".*\S.*" title="Відгук не може бути порожнім"/>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-success"><i class="bi bi-send"></i> Надіслати</button>
+                                </div>
                             </div>
-                            <div class="col">
-                                <input type="text" name="comment" class="form-control" placeholder="Напишіть ваші враження..." required/>
-                            </div>
-                            <div class="col-auto">
-                                <button class="btn btn-success"><i class="bi bi-send"></i> Надіслати</button>
-                            </div>
+                        </form>
+
+                        <div th:if="${hasReviewed}" class="alert alert-info mb-4 small py-2">
+                            <i class="bi bi-info-circle"></i> Ви вже поділилися своїми враженнями про цю книгу. Дякуємо!
                         </div>
-                    </form>
+                    </th:block>
 
                     <div sec:authorize="isAnonymous()" class="alert alert-secondary mb-4 small py-2">
                         Щоб залишити відгук, будь ласка, <a th:href="@{/login}" class="alert-link">увійдіть в систему</a>.
