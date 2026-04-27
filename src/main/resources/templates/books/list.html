@@ -24,6 +24,12 @@
         </div>
     </div>
 
+    <div th:if="${importMessage}" class="alert alert-info alert-dismissible fade show shadow-sm mb-4" role="alert">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <strong th:text="${importMessage}">Повідомлення</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
             <form th:action="@{/books}" method="get" class="row g-2 align-items-center">

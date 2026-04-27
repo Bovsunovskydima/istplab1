@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import stp.lab1.model.entity.Book;
 import stp.lab1.model.entity.BorrowRecord;
 import stp.lab1.model.entity.User;
@@ -74,8 +75,9 @@ public class BookController {
     }
 
     @PostMapping
-    public String create(@ModelAttribute Book book) {
-        bookService.save(book);
+    @PreAuthorize("hasAuthority('Admin')")
+    public String save(@ModelAttribute Book book, Principal principal) {
+        bookService.save(book, principal.getName());
         return "redirect:/books";
     }
 
@@ -88,22 +90,25 @@ public class BookController {
     }
 
     @PostMapping("/{id}/edit")
-    public String update(@PathVariable Long id, @ModelAttribute Book book) {
-        bookService.update(id, book);
-        return "redirect:/books";
+    @PreAuthorize("hasAuthority('Admin')")
+    public String update(@PathVariable Long id, @ModelAttribute Book book, Principal principal) {
+        bookService.update(id, book, principal.getName());
+        return "redirect:/books/" + id;
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable Long id) {
-        bookService.delete(id);
+    @PreAuthorize("hasAuthority('Admin')")
+    public String deleteBook(@PathVariable Long id, Principal principal) {
+        bookService.delete(id, principal.getName());
         return "redirect:/books";
     }
 
     @GetMapping("/export")
     @PreAuthorize("hasAuthority('Admin')")
-    public ResponseEntity<InputStreamResource> exportExcel() {
+    public ResponseEntity<InputStreamResource> exportExcel(Principal principal) {
         String filename = "library_books_" + java.time.LocalDate.now() + ".xlsx";
-        InputStreamResource file = new InputStreamResource(excelDataPortService.exportBooksToExcel());
+
+        InputStreamResource file = new InputStreamResource(excelDataPortService.exportBooksToExcel(principal.getName()));
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
@@ -113,9 +118,12 @@ public class BookController {
 
     @PostMapping("/import")
     @PreAuthorize("hasAuthority('Admin')")
-    public String importExcel(@RequestParam("file") MultipartFile file) {
+    public String importExcel(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes, Principal principal) {
         if (!file.isEmpty()) {
-            excelDataPortService.importBooksFromExcel(file);
+
+            String importResult = excelDataPortService.importBooksFromExcel(file, principal.getName());
+
+            redirectAttributes.addFlashAttribute("importMessage", importResult);
         }
         return "redirect:/books";
     }
